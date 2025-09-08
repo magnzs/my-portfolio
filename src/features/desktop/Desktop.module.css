@@ -1,0 +1,10 @@
+/* height definido no componente */
+.taskbar {
+    padding: 4px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: gray;
+}

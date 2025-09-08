@@ -1,0 +1,62 @@
+/* width e height definidos no componente */
+.window {
+    position: absolute;
+    pointer-events: all;
+
+    padding: 0 4 4 4px;
+
+    display: flex;
+    flex-direction: column;
+
+    user-select: contain;
+
+    background-color: rgb(169, 182, 194);
+    border: 1px solid gray;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* height definido no componente */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    user-select: none;
+
+    user-select: 'none',
+}
+
+.headerLeft {
+    width: fit-content;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.windowTitle {
+    background-color: brown;
+}
+
+.windowButtons {
+    width: fit-content;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.windowButton {
+    background-color: aqua;
+}
+
+.contentArea {
+    display: flex;
+    flex: 1;
+    
+    background-color: white;
+    border-radius: 4px;
+}
