@@ -1,20 +1,39 @@
 "use client"
 
+import { useEffect, useState } from "react";
+
 import useWindowsManager from "@/features/window/useManager";
 import Window from "@/features/window/Window";
+import Icon from "@/features/program/Icon";
+
+import { ProgramData } from "@/features/program/types";
+
 import styles from "./Desktop.module.css";
 import { OS_CONSTS } from "./config";
 
 export default function Desktop() {
     const [windows, openWindow] = useWindowsManager();
+    const [programs, setPrograms] = useState<ProgramData[]>([]);
+
+    useEffect(() => {
+        const data: ProgramData = {
+            name: "teste",
+            iconPath: "teste",
+            content: <p>teste</p>
+        };
+        setPrograms([data]);
+    }, []);
 
     return (
         <div className="h-screen flex flex-col">
 
-            {/* Área do desktop */}
+            {/* Área de trabalho */}
             <section className="relative flex-1 overflow-hidden">
-                <h1>Grid de ícones aqui</h1>
-                <button onClick={() => alert("teste")}>Botão de teste</button>
+                <div className="h-full grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] bg-blue-200">
+                    {programs.map((item, index) =>
+                        <Icon key={index} programData={item} openWindow={openWindow} />
+                    )}
+                </div>
 
                 {/* Janelas */}       
                 <div className="absolute inset-0 pointer-events-none">
@@ -23,12 +42,6 @@ export default function Desktop() {
                     )}
                 </div>
             </section>
-
-            <button className="absolute left-8 top-8 bg-blue-400 px-4 py-2 rounded-full shadow-sm text-white"
-                onClick={() => openWindow("Minha Janela", <p>Conteúdo da janela</p>)}
-            >
-                Adicionar Janela Teste
-            </button>
 
             {/* Taskbar */}
             <section className={styles.taskbar}

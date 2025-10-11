@@ -1,3 +1,5 @@
+import { ProgramData } from "@/features/program/types";
+
 export type WindowItem = {
     id: number,
     title: string,
@@ -13,5 +15,5 @@ export type WindowItem = {
 
 export type UseWindowsManagerReturn = [
     windows: WindowItem[],
-    openWindow: (title: string, content: React.ReactNode) => void
+    openWindow: (programItem: ProgramData) => void
 ];

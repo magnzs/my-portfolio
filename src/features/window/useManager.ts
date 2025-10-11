@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 
 import { UseWindowsManagerReturn, WindowItem } from "./types";
+import { ProgramData } from "../program/types";
 
 // Hook para gerenciar as janelas
 export default function useWindowsManager(): UseWindowsManagerReturn {
@@ -38,18 +39,18 @@ export default function useWindowsManager(): UseWindowsManagerReturn {
     };
 
     // adiciona uma nova janela
-    const openWindow = (title: string, content: React.ReactNode) => {
+    const openWindow = (programItem: ProgramData) => {
         _currId.current++;
         const id = _currId.current;
 
         const newItem: WindowItem = {
             id: id,
-            title: title,
+            title: programItem.name,
             isMaximized: false,
             onFocus: () => focusWindow(id),
             onClose: () => closeWindow(id),
             onChangeSize: () => changeWindowSize(id),
-            content: content
+            content: programItem.content,
         };
 
         setWindows(prev => 
