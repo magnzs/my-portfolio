@@ -1,62 +1,38 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
+import { WindowIcons, SuperIcon } from '@/config'
+import { useWindowsStore } from '@/stores/windows'
 import DesktopWindow from '@/windows/DesktopWindow.vue'
 
-type Window = {
-  id: number
-  zIndex: number
-  title: string
-  content: string
-}
+const winStore = useWindowsStore()
 
-const windows = ref<Window[]>([])
 const safeZone = ref<HTMLElement | null>(null)
-const isDragging = ref(false)
-const selectStatus = computed(() => (isDragging.value ? 'none' : 'auto'))
-
-let globalZIndex = 0
-
-function addWindow(title: string, content: string) {
-  globalZIndex++
-  const newWindow: Window = {
-    id: Date.now(),
-    zIndex: globalZIndex,
-    title,
-    content,
-  }
-  windows.value.push(newWindow)
-}
-
-function grabingWindow(id: number) {
-  isDragging.value = true
-  const window = windows.value.find((window) => window.id === id)
-  if (window) {
-    globalZIndex++
-    window.zIndex = globalZIndex
-  }
-}
-
-function closeWindow(id: number) {
-  windows.value = windows.value.filter((window) => window.id !== id)
-}
 </script>
 
 <template>
   <div class="desktop">
-    <div ref="safeZone" class="desktop__workplace">
+    <div ref="safeZone" class="workplace">
       <DesktopWindow
-        @grabing="grabingWindow(window.id)"
-        @close="closeWindow(window.id)"
-        v-for="window in windows"
+        v-for="window in winStore.activeWindows"
         :key="window.id"
-        :style="{ zIndex: window.zIndex }"
+        :id="window.id"
         :safeZone="safeZone"
-        :title="window.title"
-        :content="window.content"
       />
-      <button @click="addWindow('My Window', 'This is the content of the window.')">
-        Add Window
-      </button>
+      <button @click="winStore.addWindow('settings')">Add settings</button>
+      <button @click="winStore.addWindow('browser')">Add browser</button>
+    </div>
+    <div class="taskbar">
+      <div class="taskbar__item taskbar__start">
+        <SuperIcon :size="32" />
+      </div>
+      <div
+        class="taskbar__item"
+        v-for="window in winStore.windows"
+        :key="window.id"
+        @click="winStore.toggleMinimize(window.id)"
+      >
+        <component :is="WindowIcons[window.type]" :size="32" />
+      </div>
     </div>
   </div>
 </template>
@@ -67,17 +43,15 @@ function closeWindow(id: number) {
   width: 100dvw;
   height: 100dvh;
   display: grid;
-  grid-template-rows: 1fr;
+  grid-template-rows: 1fr 60px;
   overflow: hidden;
 }
 
-.desktop__workplace {
+.workplace {
   top: 0px;
   left: 0px;
   position: relative;
-  height: 100%;
-  background-color: #ebf0f1;
-  user-select: v-bind(selectStatus);
+  user-select: none;
 }
 
 button {
@@ -85,5 +59,39 @@ button {
   padding: 8px;
   background-color: #007bff;
   border-radius: 8px;
+}
+
+.taskbar {
+  background-color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+}
+
+.taskbar__item {
+  height: 80%;
+  aspect-ratio: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  color: #fff;
+  background-color: #555;
+  transition: 0.1s ease;
+}
+
+.taskbar__item:hover {
+  filter: brightness(1.2);
+}
+
+.taskbar__item:active {
+  scale: 0.9;
+  filter: brightness(1.4);
+}
+
+.taskbar__start {
+  background-color: #244ad5;
 }
 </style>

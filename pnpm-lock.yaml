@@ -14,6 +14,9 @@ importers:
       '@vueuse/core':
         specifier: ^14.2.1
         version: 14.2.1(vue@3.5.30(typescript@5.9.3))
+      mitt:
+        specifier: ^3.0.1
+        version: 3.0.1
       modern-normalize:
         specifier: ^3.0.1
         version: 3.0.1

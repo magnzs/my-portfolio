@@ -1,0 +1,8 @@
+:root,
+body {
+  font-family: 'Inter Variable' !important;
+  font-feature-settings:
+    'salt' on,
+    'ss01' on,
+    'cv05' on;
+}

@@ -1,38 +1,64 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { Minimize, Maximize, X } from '@lucide/vue'
+import { emitter } from '@/services/events'
+import { useWindowsStore } from '@/stores/windows'
 import { useDraggable, useWindowSize } from '@vueuse/core'
-import { Maximize, X } from '@lucide/vue'
+
+const winStore = useWindowsStore()
+const window = computed(() => winStore.windows.find((w) => w.id === props.id)!)
 
 const el = ref<HTMLElement | null>(null)
 const handle = ref<HTMLElement | null>(null)
-const isMaximized = ref(false)
+const containerStyle = computed(() => {
+  return window.value.state === 'maximized' ? MAXIMIZED_STYLE : style.value
+})
+
+const MAXIMIZED_STYLE = {
+  top: '0',
+  left: '0',
+  width: '100%',
+  height: '100%',
+}
 
 const props = defineProps<{
+  id: number
   safeZone: HTMLElement | null
-  title: string
-  content: string
 }>()
 
-defineEmits<{
-  (e: 'grabing'): void
-  (e: 'close'): void
-}>()
+onMounted(() => {
+  emitter.on('window:focused', (id) => {
+    if (id === props.id) console.log(`Window ${id} focused`)
+  })
+
+  emitter.on('window:restored', (id) => {
+    if (id === props.id) console.log(`Window ${id} restored`)
+  })
+
+  emitter.on('window:maximized', (id) => {
+    if (id === props.id) console.log(`Window ${id} maximized`)
+  })
+})
+
+onUnmounted(() => {
+  emitter.off('window:focused')
+  emitter.off('window:restored')
+  emitter.off('window:maximized')
+})
 
 const { x, y, style } = useDraggable(el, {
-  initialValue: { x: 100, y: 100 },
+  initialValue: {
+    x: window.value!.x,
+    y: window.value!.y,
+  },
   containerElement: props.safeZone,
   handle: handle,
 })
 
-function onMaximize() {
-  console.log('teste')
-  isMaximized.value = !isMaximized.value
-}
-
 const { width, height } = useWindowSize()
 // Sempre que a tela mudar de tamanho (zoom ou redimensionar janela)
 watch([width, height], () => {
-  if (isMaximized.value) return // Janela maximizada não precisa de ajuste
+  if (window.value.state === 'maximized') return // Janela maximizada não precisa de ajuste
 
   const elRect = el.value?.getBoundingClientRect()
   if (!elRect) return
@@ -55,22 +81,28 @@ watch([width, height], () => {
 <template>
   <div
     class="window__container"
-    @mousedown="$emit('grabing')"
+    @mousedown="winStore.focusWindow(id)"
     ref="el"
-    :style="isMaximized ? { top: 0, left: 0, width: '100%', height: '100%' } : style"
+    :style="containerStyle"
   >
     <div class="window__header" ref="handle">
-      <div>{{ props.title }}</div>
+      <div>{{ window.type }}</div>
       <div class="window__header-buttons">
-        <button class="window__header-button" @click="onMaximize">
+        <button class="window__header-button" @click="winStore.toggleMinimize(id)">
+          <Minimize />
+        </button>
+        <button class="window__header-button" @click="winStore.toggleMaximize(id)">
           <Maximize />
         </button>
-        <button class="window__header-button" @click="$emit('close')">
+        <button class="window__header-button" @click="winStore.removeWindow(id)">
           <X />
         </button>
       </div>
     </div>
-    <div class="window__content">{{ props.content }}</div>
+    <div class="window__content">
+      <p>Página kkkkkkkkkkkkkkkkkk</p>
+      <p>1l76192735011lLiIlI googIe</p>
+    </div>
   </div>
 </template>
 
